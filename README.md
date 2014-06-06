@@ -26,6 +26,7 @@ Cow 는 Codeigniter의 session 라이브러리가 선행적으로 로드되어 �
    * pw_column은 password 데이터가 저장되는 컬럼 입니다.
    * session_field는 session에서 사용자의 마지막 활동 시간을 기록하는 필드명입니다.
    * expire는 사용자가 일정시간 이무 행동도 하지 않았을때 자동 로그 아웃 되는 시간으로 단위는 초이다.
+   */
 ```
 
 # 로그인 처리를 해보자
