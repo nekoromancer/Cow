@@ -49,8 +49,7 @@ Cow 는 Codeigniter의 session 라이브러리가 선행적으로 로드되어 �
     );
   }, true);
   
-  if( !$this->mex->post() )
-  {
+  $this->mex->request('/', function(){
     // 아무런 요청이 없을 경우 동작
   }
 ```
