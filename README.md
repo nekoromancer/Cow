@@ -30,6 +30,7 @@ Cow 는 Codeigniter의 session 라이브러리가 선행적으로 로드되어 �
 ```
 
 # 로그인 처리를 해보자
+## login( $id, $password, $success_callback_function, $fail_callback_function )
 로그인 데이터는 ID와 Password 뿐이며 POST로 전송된다고 가정합니다.  view쪽 코드는 생략하고 Form Action으로 아래의 컨트롤러 함수를 호출합니다.
 
 ```php
@@ -55,6 +56,7 @@ Cow 는 Codeigniter의 session 라이브러리가 선행적으로 로드되어 �
 ```
 
 # 타임아웃 처리
+## timeout( $timeout_function )
 타임아웃 처리는 생성자 함수 내에서 체크할 것을 권장합니다.
 
 ```php
@@ -64,6 +66,7 @@ Cow 는 Codeigniter의 session 라이브러리가 선행적으로 로드되어 �
 ```
 
 # 해시값 생성
+## pwGen( $plain_text )
 ```php
   $hash = $this->cow->pwGen( 'plaintext' );
   echo $hash;
