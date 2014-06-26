@@ -108,7 +108,7 @@ class Cow {
    * Hash by BCRYPT.  PHP version >= 5.5.0
    */
 
-  private function crypt_by_bcrypt( $plain_input = null, $detail =false )
+  public function crypt_by_bcrypt( $plain_input = null, $detail =false )
   {
     $check = $this->$this->check_php_version(550);
 
@@ -141,7 +141,7 @@ class Cow {
    * Hash by SHA256.  PHP version >= 5.3.2
    */
     
-  private function crypt_by_sha256( $plain_input = null, $detail = false )
+  public function crypt_by_sha256( $plain_input = null, $detail = false, $salt_length = 16, $iteration = 9000 )
   {
     $check = $this->check_php_version(532);
 
@@ -150,9 +150,9 @@ class Cow {
       show_error( $check['message'] );
     }
 
-    $salt = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
+    $salt = mcrypt_create_iv($salt_length, MCRYPT_DEV_URANDOM);
     $salt = base64_encode($salt);
-    $hash = crypt($plain_input, '$5$rounds=9000$'.$salt.'$');
+    $hash = crypt($plain_input, '$5$rounds='.$iteration.'$'.$salt.'$');
 
     if( $detail )
     {
@@ -174,7 +174,7 @@ class Cow {
    * Hash by MD5.  PHP version >= 5.3.0
    */
 
-  private function crypt_by_md5( $plain_input = null, $detail = fasle )
+  public function crypt_by_md5( $plain_input = null, $detail = fasle, $salt_length = 8 )
   {
     $check = $this->check_php_version(530);
 
@@ -183,7 +183,7 @@ class Cow {
       show_error( $check['message'] );
     }
 
-    $salt = mcrypt_create_iv(8, MCRYPT_DEV_URANDOM);
+    $salt = mcrypt_create_iv($salt_length, MCRYPT_DEV_URANDOM);
     $salt = base64_encode($salt);
     $hash = crypt($plain_input, '$1$'.$salt.'$');
 
