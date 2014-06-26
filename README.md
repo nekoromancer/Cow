@@ -41,7 +41,7 @@ Cow 는 Codeigniter의 session 라이브러리가 선행적으로 로드되어 �
     $pw = & $req['user_pw'];
     
     $this->cow->login( $id, $pw,
-      functino($req){
+      function($req){
         // 로그인 성공했을 때 동작
       },
       function($req){
