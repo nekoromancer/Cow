@@ -33,13 +33,13 @@ class Cow {
     $this->db = $this->CI->db;
   }
 
-  private function configValidatoin()
+  private function config_validation()
   {
     foreach( $this->config as $key => $value )
     {
       if( !$this->config[$key] )
       {
-        show_error( 'Configuration value \''.$key.'\' is required. Please set a value through setConfig() function.', 500);
+        show_error( 'Configuration value \''.$key.'\' is required. Please set a value through set_config() function.', 500);
       }
     }
   }
@@ -48,7 +48,7 @@ class Cow {
    * Check php version.
    */
 
-  private function checkPhpVersion( $minimum = null )
+  private function check_php_version( $minimum = null )
   {
     $version = phpversion();
     $version = (int)(preg_replace('/\./', '', $version));
@@ -77,14 +77,14 @@ class Cow {
    * Hash Generator.
    */
 
-  public function pwGen( $plain_input = null, $detail = false )
+  public function pw_gen( $plain_input = null, $detail = false )
   {
     if( !$plain_input )
     {
       show_error( '1st parameter( plain text to crypt ) must be required', 500 );
     }
 
-    $version = checkPhpVersion();
+    $version = check_php_version();
 
     if( $version < 530 ) 
     {
@@ -92,15 +92,15 @@ class Cow {
     }
     else if( $version >= 550 )
     {
-      return cryptByBcrypt( $plain_input, $detail );
+      return crypt_by_bcrypt( $plain_input, $detail );
     }
     else if( $version < 532 )
     {
-      return cryptByMD5( $plain_input, $detail );
+      return crypt_by_md5( $plain_input, $detail );
     }
     else
     {
-      return cryptBySHA256( $plain_input, $detail );
+      return crypt_by_sha256( $plain_input, $detail );
     }
   }
 
@@ -108,8 +108,10 @@ class Cow {
    * Hash by BCRYPT.  PHP version >= 5.5.0
    */
 
-  private function cryptByBcrypt( $plain_input = null, $detail =false )
+  private function crypt_by_bcrypt( $plain_input = null, $detail =false )
   {
+    $check = $this->$this->check_php_version(550);
+
     if( !$check['result'] )
     {
       show_error( $check['message'] );
@@ -139,8 +141,10 @@ class Cow {
    * Hash by SHA256.  PHP version >= 5.3.2
    */
     
-  private function cryptBySHA256( $plain_input = null, $detail = false )
+  private function crypt_by_sha256( $plain_input = null, $detail = false )
   {
+    $check = $this->check_php_version(532);
+
     if( !$check['result'] )
     {
       show_error( $check['message'] );
@@ -170,8 +174,10 @@ class Cow {
    * Hash by MD5.  PHP version >= 5.3.0
    */
 
-  private function cryptByMD5( $plain_input = null, $detail = fasle )
+  private function crypt_by_md5( $plain_input = null, $detail = fasle )
   {
+    $check = $this->check_php_version(530);
+
     if( !$check['result'] )
     {
       show_error( $check['message'] );
@@ -201,7 +207,7 @@ class Cow {
    * Password Verification.
    */
 
-  public function pwVerify( $plain_input, $hash )
+  public function pw_verify( $plain_input, $hash )
   {
     if( preg_match('/^\$2y\$/', $hash) )
     {
@@ -238,7 +244,7 @@ class Cow {
    * Config 값 사용자 정의
    */
 
-  public function setConfig( $config )
+  public function set_config( $config )
   {
     foreach( $config as $key => $value )
     {
@@ -249,23 +255,23 @@ class Cow {
   /*
    * $id : submitted user id
    * $pw : submitted user password
-   * $successCallback : it's callback function. if login success, this function called.
-   * $failedCallback : it's callback function. if login failed, this function called.
+   * $success_callback : it's callback function. if login success, this function called.
+   * $failed_callback : it's callback function. if login failed, this function called.
    *
    */
 
-  public function login( $id, $pw, $successCallback, $failedCallback )
+  public function login( $id, $pw, $success_callback, $failed_callback )
   {
-    $this->configValidatoin();
+    $this->config_validation();
     $table = & $this->config['table'];
-    $idColumn = & $this->config['id_column'];
-    $pwColumn = & $this->config['pw_column'];
+    $id_column = & $this->config['id_column'];
+    $pw_column = & $this->config['pw_column'];
 
     $res = array();
 
     // ID Check
 
-    $this->db->where($idColumn, $id);
+    $this->db->where($id_column, $id);
     $idCheck = $this->db->count_all_results($table);
 
     if( $idCheck === 0 )
@@ -275,26 +281,26 @@ class Cow {
       $res['message'] = $this->config['message_no_id'];
 
       // 아이디 없음 > 실패 콜백함수로 전달
-      call_user_func( $failedCallback, $res );
+      call_user_func( $failed_callback, $res );
       return false;
     }
 
-    $this->db->select('password');
-    $this->db->where($idColumn, $id);
-    $hashedPass = $this->db->get($table)->result_array()[0]['password'];
+    $this->db->select($pw_column);
+    $this->db->where($id_column, $id);
+    $hashed_pass = $this->db->get($table)->result_array()[0][$pw_column];
 
-    $pwCheck = $this->pwVerify( $pw, $hashedPass );
+    $pw_check = $this->pw_verify( $pw, $hashed_pass );
 
     // Password Check
 
-    if( !$pwCheck )
+    if( !$pw_check )
     {
       $res['result'] = false;
       $res['code'] = '02';
       $res['message'] = $this->config['message_no_pw'];
 
       // Password 틀림 > 실패 콜백함수에 전달
-      call_user_func( $failedCallback, $res );
+      call_user_func( $failed_callback, $res );
       return false;
     }
 
@@ -303,7 +309,7 @@ class Cow {
     $res['code'] = '00';
     $res['message'] = $this->config['message_success'];
 
-    call_user_func( $successCallback, $res );
+    call_user_func( $success_callback, $res );
     return true;
   }
 
@@ -312,19 +318,19 @@ class Cow {
    * 기본값은 600초
    */
 
-  public function timeout( $timeoutCallback )
+  public function timeout( $timeout_callback )
   {
     if( !isset( $this->config['session_field'] ) )
     {
-      show_error('\'session_field\' is required to use timeout() function', 500);
+      show_error('\'session_field\' in configuration value is required to use timeout() function', 500);
     }
     $field = & $this->config['session_field'];
     $expire = & $this->config['expire'];
-    $lastAction = & $this->CI->session->userdata($field);
+    $last_action = & $this->CI->session->userdata($field);
 
-    if( mktime() - $lastAction > $expire )
+    if( mktime() - $last_action > $expire )
     {
-      call_user_func( $timeoutCallback );
+      call_user_func( $timeout_callback );
     }
     else
     {
